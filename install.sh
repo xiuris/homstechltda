@@ -165,8 +165,22 @@ fi
         sudo chmod 777 $dirHtdocs/mapos/application/config/.env.example
         sudo rm -f $dirHtdocs/mapos/.htaccess
         echo
-        echo "* Criando banco de dados."
-        $dirMySQL -u root -e "CREATE DATABASE mapos;"
+        echo "* Configurando banco de dados."
+        if $dirMySQL -u root -e "quit" &> /dev/null; then
+            echo "* O usuario root do MySQL esta sem senha."
+            read -s -p "Defina uma senha para o usuario root (Pressione Enter para gerar uma): " db_pass
+            echo
+            if [ -z "$db_pass" ]; then
+                db_pass=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+                echo "Senha gerada: $db_pass"
+            fi
+            $dirMySQL -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$db_pass';"
+        else
+            echo "* O usuario root do MySQL ja possui uma senha."
+            read -s -p "Digite a senha ATUAL do usuario root do MySQL: " db_pass
+            echo
+        fi
+        $dirMySQL -u root -p"$db_pass" -e "CREATE DATABASE mapos;"
     fi
 # <=== Fim Instalação MAP-OS ===>
 
@@ -202,7 +216,11 @@ fi
     echo
     echo "Host: localhost"
     echo "Usuario: root"
-    echo "Senha: \"Em Branco\""
+    if [ -z "$db_pass" ]; then
+        echo "Senha: \"Em Branco\""
+    else
+        echo "Senha: $db_pass"
+    fi
     echo "Banco de Dados: mapos"
     echo
     echo Nome: "Digite seu Nome Completo"
@@ -270,7 +288,7 @@ fi
             echo "* Nao alterado valor da primeira OS."
     elif [ "$resposta" = "S" ] || [ "$resposta" = "s" ]; then
         read -p "Informe o numero (Padrao: 1):" nOS
-        $dirMySQL -u root -e "USE mapos; ALTER TABLE os AUTO_INCREMENT=$nOS;"
+        $dirMySQL -u root -p"$db_pass" -e "USE mapos; ALTER TABLE os AUTO_INCREMENT=$nOS;"
         echo "* Número da próxima OS alterado para $nOS"
     fi
     # <=== Fim Configuracao da Cron ===>
