@@ -90,11 +90,21 @@ fi
 
 # <=== Inicio Download de Dependências ===>
     clear
-    echo "# BAIXANDO DEPENDENCIAS..."
+    echo "# BAIXANDO DEPENDENCIAS E COMPONENTES..."
     if [ ! -d "$dirDefault" ]; then
         mkdir $dirDefault
     fi
-    $installCommand install -y wget unzip curl &> /dev/null
+
+    # Definindo pacotes a serem instalados
+    pkgs="wget unzip curl"
+    if [ ! -d "$dirXampp" ]; then
+        pkgs="$pkgs php-curl php-gd php-zip php-xml"
+    fi
+    if ! command -v composer &> /dev/null; then
+        pkgs="$pkgs composer"
+    fi
+
+    $installCommand install -y $pkgs &> /dev/null
 # <=== Fim Download de Dependências ===>
 
 # <=== Inicio Instalação XAMPP ===>
@@ -112,8 +122,6 @@ fi
         chmod +x $dirDefault/xampp-installer.run
         sudo $dirDefault/xampp-installer.run --mode unattended
         echo
-        echo "* Por favor aguarde, instalando Extensões PHP"
-        $installCommand install -y php-curl php-gd php-zip php-xml &> /dev/null
         $dirXampp/lampp restart
     fi
     echo
@@ -178,9 +186,6 @@ fi
     if command -v composer &> /dev/null
     then
         echo "* Composer ja esta instalado."
-    else
-        echo "* Instalando Composer"
-        sudo apt install composer -y &> /dev/null
     fi
     echo
     echo "* Verificando complemento"
