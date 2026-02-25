@@ -94,7 +94,7 @@ fi
     if [ ! -d "$dirDefault" ]; then
         mkdir $dirDefault
     fi
-    $installCommand install -y wget unzip curl &> /dev/null
+    $installCommand install -y wget unzip curl php-curl php-gd php-zip php-xml &> /dev/null
 # <=== Fim Download de Dependências ===>
 
 # <=== Inicio Instalação XAMPP ===>
@@ -111,9 +111,6 @@ fi
         echo "* Por favor aguarde, a instalacao pode levar ate 5 min."
         chmod +x $dirDefault/xampp-installer.run
         sudo $dirDefault/xampp-installer.run --mode unattended
-        echo
-        echo "* Por favor aguarde, instalando Extensões PHP"
-        $installCommand install -y php-curl php-gd php-zip php-xml &> /dev/null
         $dirXampp/lampp restart
     fi
     echo

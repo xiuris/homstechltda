@@ -1,0 +1,3 @@
+## 2025-02-25 - Consolidating System Package Installations
+**Learning:** Multiple calls to `apt-get install` in shell scripts (like `install.sh`) add significant overhead. Consolidating them is a key optimization.
+**Action:** Group compatible `apt-get install` commands. However, be mindful of dependency execution order (e.g., installing system PHP vs XAMPP) and review feedback regarding "unrequested dependencies" (like moving `composer` if it risks changing environment state too early). In this case, we consolidated `php-*` extensions into the initial download step but kept `composer` separate to minimize risk and respect the original flow.
