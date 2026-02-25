@@ -156,13 +156,17 @@ fi
         mv -i $dirHtdocs/*mapos* $dirHtdocs/mapos
         echo
         echo "* Atribuindo permissões."
-        sudo chmod 777 $dirHtdocs/mapos/updates/
-        sudo chmod 777 $dirHtdocs/mapos/application/
-        sudo chmod 777 $dirHtdocs/mapos/index.php
-        sudo chmod 777 $dirHtdocs/mapos/application/config/config.php
-        sudo chmod 777 $dirHtdocs/mapos/application/config/database.php
-        sudo chmod 777 $dirHtdocs/mapos/application/config/.env
-        sudo chmod 777 $dirHtdocs/mapos/application/config/.env.example
+        # Identifica o usuário do servidor web (daemon para XAMPP, www-data para Apache)
+        if id "daemon" >/dev/null 2>&1; then
+            WEB_USER="daemon"
+        elif id "www-data" >/dev/null 2>&1; then
+            WEB_USER="www-data"
+        else
+            WEB_USER=$(whoami)
+        fi
+        sudo chown -R $WEB_USER:$WEB_USER $dirHtdocs/mapos/
+        sudo find $dirHtdocs/mapos/ -type d -exec chmod 755 {} +
+        sudo find $dirHtdocs/mapos/ -type f -exec chmod 644 {} +
         sudo rm -f $dirHtdocs/mapos/.htaccess
         echo
         echo "* Criando banco de dados."
