@@ -27,7 +27,8 @@
         ]
     },
     "config": {
-        "vendor-dir": "application/vendor"
+        "vendor-dir": "application/vendor",
+        "optimize-autoloader": true
     },
     "autoload": {
         "psr-4": {
