@@ -185,12 +185,8 @@ ECHO [Autostart]>> %dirXampp%\xampp-control.ini
 ECHO Apache=1 >> %dirXampp%\xampp-control.ini
 ECHO MySQL=1 >> %dirXampp%\xampp-control.ini
 ECHO.
-ECHO Ativando Extensoes do PHP
-PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace ';extension=gd', 'extension=gd'} | Set-Content -Path '%dirPHP%\php.ini'"
-PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace ';extension=zip', 'extension=zip'} | Set-Content -Path '%dirPHP%\php.ini'"
-ECHO.
-ECHO Configurando PHP TimeZone
-PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace 'date.timezone=Europe/Berlin', 'date.timezone=America/Sao_Paulo'} | Set-Content -Path '%dirPHP%\php.ini'"
+ECHO Ativando Extensoes do PHP e Configurando TimeZone
+PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace ';extension=gd', 'extension=gd' -replace ';extension=zip', 'extension=zip' -replace 'date.timezone=Europe/Berlin', 'date.timezone=America/Sao_Paulo'} | Set-Content -Path '%dirPHP%\php.ini'"
 ECHO.
 ECHO Reinciando Servicos Apache, MySQL e Xampp
 TASKKILL /F /IM httpd.exe /T >NUL 2>&1
