@@ -1,0 +1,3 @@
+## 2024-XX-XX - [Optimize Install Scripts]
+**Learning:** Shell and batch scripts that run sequential external commands (like sed, apt-get, powershell -command) suffer from significant startup overhead per command. Specifically, calling `PowerShell -command` inside a loop or multiple times consecutively has high engine startup latency. Also, multiple single `apt-get install` commands are slower than one combined command, but the `install.sh` already tries to combine packages. `install.bat` uses `PowerShell -command` individually multiple times for string replacement.
+**Action:** When working on installer scripts, group batch string replacements or external command invocations into a single shell or PowerShell execution if possible.
