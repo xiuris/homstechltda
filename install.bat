@@ -186,8 +186,7 @@ ECHO Apache=1 >> %dirXampp%\xampp-control.ini
 ECHO MySQL=1 >> %dirXampp%\xampp-control.ini
 ECHO.
 ECHO Ativando Extensoes do PHP
-PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace ';extension=gd', 'extension=gd'} | Set-Content -Path '%dirPHP%\php.ini'"
-PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace ';extension=zip', 'extension=zip'} | Set-Content -Path '%dirPHP%\php.ini'"
+PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace ';extension=gd', 'extension=gd' -replace ';extension=zip', 'extension=zip'} | Set-Content -Path '%dirPHP%\php.ini'"
 ECHO.
 ECHO Configurando PHP TimeZone
 PowerShell -command "&{(Get-Content -Path '%dirPHP%\php.ini') -replace 'date.timezone=Europe/Berlin', 'date.timezone=America/Sao_Paulo'} | Set-Content -Path '%dirPHP%\php.ini'"
@@ -293,12 +292,7 @@ ECHO.
 CHOICE /C SN /M "Confirma a informacoes acima?"
 IF ERRORLEVEL 2 SET step=7 && GOTO etapa0
 IF ERRORLEVEL 1 ECHO Configurando dados de E-mail
-FOR /F %%A IN (' findstr /b /c:"EMAIL_PROTOCOL" "%dirMaposConfig%" ') DO PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '%%A', 'EMAIL_PROTOCOL=%protocolo%'} | Set-Content -Path '%dirMaposConfig%'"
-FOR /F %%A IN (' findstr /b /c:"EMAIL_SMTP_HOST" "%dirMaposConfig%" ') DO PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '%%A', 'EMAIL_SMTP_HOST=%hostsmtp%'} | Set-Content -Path '%dirMaposConfig%'"
-FOR /F %%A IN (' findstr /b /c:"EMAIL_SMTP_CRYPTO" "%dirMaposConfig%" ') DO PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '%%A', 'EMAIL_SMTP_CRYPTO=%criptografia%'} | Set-Content -Path '%dirMaposConfig%'"
-FOR /F %%A IN (' findstr /b /c:"EMAIL_SMTP_PORT" "%dirMaposConfig%" ') DO PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '%%A', 'EMAIL_SMTP_PORT=%porta%'} | Set-Content -Path '%dirMaposConfig%'"
-FOR /F %%A IN (' findstr /b /c:"EMAIL_SMTP_USER" "%dirMaposConfig%" ') DO PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '%%A', 'EMAIL_SMTP_USER=%email%'} | Set-Content -Path '%dirMaposConfig%'"
-FOR /F %%A IN (' findstr /b /c:"EMAIL_SMTP_PASS" "%dirMaposConfig%" ') DO PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '%%A', 'EMAIL_SMTP_PASS=%senha%'} | Set-Content -Path '%dirMaposConfig%'"
+PowerShell -command "&{(Get-Content -Path '%dirMaposConfig%') -replace '^EMAIL_PROTOCOL.*', 'EMAIL_PROTOCOL=''%protocolo%''' -replace '^EMAIL_SMTP_HOST.*', 'EMAIL_SMTP_HOST=''%hostsmtp%''' -replace '^EMAIL_SMTP_CRYPTO.*', 'EMAIL_SMTP_CRYPTO=''%criptografia%''' -replace '^EMAIL_SMTP_PORT.*', 'EMAIL_SMTP_PORT=''%porta%''' -replace '^EMAIL_SMTP_USER.*', 'EMAIL_SMTP_USER=''%email%''' -replace '^EMAIL_SMTP_PASS.*', 'EMAIL_SMTP_PASS=''%senha%'''} | Set-Content -Path '%dirMaposConfig%'"
 GOTO etapa0
 :: <=== Fim Configuração de dados de E-mail ===>
 
