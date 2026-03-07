@@ -1,0 +1,3 @@
+## 2024-03-03 - Installer Process Spawning Overhead
+**Learning:** Sequential calls to `sed` in bash and `PowerShell` in Windows batch scripts for simple file string replacements incur massive overhead due to repeated process spawning and file I/O operations. In `install.bat`, invoking PowerShell inside a `FOR` loop is an anti-pattern that heavily slows down installation.
+**Action:** Always consolidate multiple file replacements into a single invocation. Use `sed -i -e 's/a/b/' -e 's/c/d/' file` in bash. In PowerShell, chain `-replace` operators like `(Get-Content file) -replace 'a','b' -replace 'c','d' | Set-Content file`.
