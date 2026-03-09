@@ -1,0 +1,3 @@
+## 2024-05-24 - Installer Process Spawn Optimizations
+**Learning:** In installer scripts (`install.bat` and `install.sh`), executing multiple replacements on the same file sequentially by spawning multiple processes (like `PowerShell` in Windows or `sed` in Linux) is a major performance bottleneck, heavily slowing down execution overhead. This is a recurring pattern observed in this specific codebase setup scripts.
+**Action:** Chain multiple replacements into a single process execution block. For Linux `sed`, use multiple `-e` flags. For Windows `PowerShell` inside `.bat`, chain `-replace` operators, completely removing the slow `FOR /F` loop wrap that reads line by line.

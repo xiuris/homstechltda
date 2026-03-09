@@ -267,12 +267,14 @@ fi
             read -p "Informe o Email (Ex: nome@seudominio.com): " email
             read -p "Informe a Senha (****): " senha
 
-            sed -i "s/\EMAIL_PROTOCOL.*/\EMAIL_PROTOCOL='$protocolo'/" $dirMaposConfig
-            sed -i "s/\EMAIL_SMTP_HOST.*/\EMAIL_SMTP_HOST='$hostsmtp'/" $dirMaposConfig
-            sed -i "s/\EMAIL_SMTP_CRYPTO.*/\EMAIL_SMTP_CRYPTO='$criptografia'/" $dirMaposConfig
-            sed -i "s/\EMAIL_SMTP_PORT.*/\EMAIL_SMTP_PORT='$porta'/" $dirMaposConfig
-            sed -i "s/\EMAIL_SMTP_USER.*/\EMAIL_SMTP_USER='$email'/" $dirMaposConfig
-            sed -i "s/\EMAIL_SMTP_PASS.*/\EMAIL_SMTP_PASS='$senha'/" $dirMaposConfig
+            # ⚡ Bolt: Consolidated multiple sed commands into a single invocation
+            # to reduce process spawns and file I/O operations.
+            sed -i -e "s/EMAIL_PROTOCOL.*/EMAIL_PROTOCOL='$protocolo'/" \
+                   -e "s/EMAIL_SMTP_HOST.*/EMAIL_SMTP_HOST='$hostsmtp'/" \
+                   -e "s/EMAIL_SMTP_CRYPTO.*/EMAIL_SMTP_CRYPTO='$criptografia'/" \
+                   -e "s/EMAIL_SMTP_PORT.*/EMAIL_SMTP_PORT='$porta'/" \
+                   -e "s/EMAIL_SMTP_USER.*/EMAIL_SMTP_USER='$email'/" \
+                   -e "s/EMAIL_SMTP_PASS.*/EMAIL_SMTP_PASS='$senha'/" $dirMaposConfig
             echo
             echo "* Dados de Email alterados com sucesso."
         fi
