@@ -1,0 +1,3 @@
+## 2024-05-18 - Script File I/O Optimization
+**Learning:** In environment setup scripts like `install.sh` and `install.bat`, using multiple sequential `sed -i` commands or invoking `PowerShell -command` inside loops creates a significant bottleneck due to repeated process spawning and redundant file I/O on the same target file.
+**Action:** Always consolidate file modifications. Use multiple `-e` expressions in a single `sed` call in Bash. In Windows batch files, retrieve needed values first, then invoke PowerShell once chaining multiple `-replace` operations to update a configuration file simultaneously. Also, prefer standard `ECHO` for appending simple text to scripts instead of invoking PowerShell `Add-Content`.
