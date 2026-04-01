@@ -94,6 +94,9 @@ fi
     if [ ! -d "$dirDefault" ]; then
         mkdir $dirDefault
     fi
+ bolt-optimize-install-sh-3904251232548191300
+    $installCommand install -y wget unzip curl php-curl php-gd php-zip php-xml &> /dev/null
+=======
 
     # Definindo pacotes a serem instalados
     pkgs="wget unzip curl"
@@ -105,6 +108,7 @@ fi
     fi
 
     $installCommand install -y $pkgs &> /dev/null
+ main
 # <=== Fim Download de Dependências ===>
 
 # <=== Inicio Instalação XAMPP ===>
@@ -121,7 +125,10 @@ fi
         echo "* Por favor aguarde, a instalacao pode levar ate 5 min."
         chmod +x $dirDefault/xampp-installer.run
         sudo $dirDefault/xampp-installer.run --mode unattended
+ bolt-optimize-install-sh-3904251232548191300
+=======
         echo
+ main
         $dirXampp/lampp restart
     fi
     echo
