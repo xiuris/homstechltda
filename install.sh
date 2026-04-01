@@ -90,11 +90,25 @@ fi
 
 # <=== Inicio Download de Dependências ===>
     clear
-    echo "# BAIXANDO DEPENDENCIAS..."
+    echo "# BAIXANDO DEPENDENCIAS E COMPONENTES..."
     if [ ! -d "$dirDefault" ]; then
         mkdir $dirDefault
     fi
+ bolt-optimize-install-sh-3904251232548191300
     $installCommand install -y wget unzip curl php-curl php-gd php-zip php-xml &> /dev/null
+=======
+
+    # Definindo pacotes a serem instalados
+    pkgs="wget unzip curl"
+    if [ ! -d "$dirXampp" ]; then
+        pkgs="$pkgs php-curl php-gd php-zip php-xml"
+    fi
+    if ! command -v composer &> /dev/null; then
+        pkgs="$pkgs composer"
+    fi
+
+    $installCommand install -y $pkgs &> /dev/null
+ main
 # <=== Fim Download de Dependências ===>
 
 # <=== Inicio Instalação XAMPP ===>
@@ -111,6 +125,10 @@ fi
         echo "* Por favor aguarde, a instalacao pode levar ate 5 min."
         chmod +x $dirDefault/xampp-installer.run
         sudo $dirDefault/xampp-installer.run --mode unattended
+ bolt-optimize-install-sh-3904251232548191300
+=======
+        echo
+ main
         $dirXampp/lampp restart
     fi
     echo
@@ -153,17 +171,35 @@ fi
         mv -i $dirHtdocs/*mapos* $dirHtdocs/mapos
         echo
         echo "* Atribuindo permissões."
-        sudo chmod 777 $dirHtdocs/mapos/updates/
-        sudo chmod 777 $dirHtdocs/mapos/application/
-        sudo chmod 777 $dirHtdocs/mapos/index.php
-        sudo chmod 777 $dirHtdocs/mapos/application/config/config.php
-        sudo chmod 777 $dirHtdocs/mapos/application/config/database.php
-        sudo chmod 777 $dirHtdocs/mapos/application/config/.env
-        sudo chmod 777 $dirHtdocs/mapos/application/config/.env.example
+        # Identifica o usuário do servidor web (daemon para XAMPP, www-data para Apache)
+        if id "daemon" >/dev/null 2>&1; then
+            WEB_USER="daemon"
+        elif id "www-data" >/dev/null 2>&1; then
+            WEB_USER="www-data"
+        else
+            WEB_USER=$(whoami)
+        fi
+        sudo chown -R $WEB_USER:$WEB_USER $dirHtdocs/mapos/
+        sudo find $dirHtdocs/mapos/ -type d -exec chmod 755 {} +
+        sudo find $dirHtdocs/mapos/ -type f -exec chmod 644 {} +
         sudo rm -f $dirHtdocs/mapos/.htaccess
         echo
-        echo "* Criando banco de dados."
-        $dirMySQL -u root -e "CREATE DATABASE mapos;"
+        echo "* Configurando banco de dados."
+        if $dirMySQL -u root -e "quit" &> /dev/null; then
+            echo "* O usuario root do MySQL esta sem senha."
+            read -s -p "Defina uma senha para o usuario root (Pressione Enter para gerar uma): " db_pass
+            echo
+            if [ -z "$db_pass" ]; then
+                db_pass=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+                echo "Senha gerada: $db_pass"
+            fi
+            $dirMySQL -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$db_pass';"
+        else
+            echo "* O usuario root do MySQL ja possui uma senha."
+            read -s -p "Digite a senha ATUAL do usuario root do MySQL: " db_pass
+            echo
+        fi
+        $dirMySQL -u root -p"$db_pass" -e "CREATE DATABASE mapos;"
     fi
 # <=== Fim Instalação MAP-OS ===>
 
@@ -175,9 +211,6 @@ fi
     if command -v composer &> /dev/null
     then
         echo "* Composer ja esta instalado."
-    else
-        echo "* Instalando Composer"
-        sudo apt install composer -y &> /dev/null
     fi
     echo
     echo "* Verificando complemento"
@@ -199,7 +232,11 @@ fi
     echo
     echo "Host: localhost"
     echo "Usuario: root"
-    echo "Senha: \"Em Branco\""
+    if [ -z "$db_pass" ]; then
+        echo "Senha: \"Em Branco\""
+    else
+        echo "Senha: $db_pass"
+    fi
     echo "Banco de Dados: mapos"
     echo
     echo Nome: "Digite seu Nome Completo"
@@ -267,7 +304,7 @@ fi
             echo "* Nao alterado valor da primeira OS."
     elif [ "$resposta" = "S" ] || [ "$resposta" = "s" ]; then
         read -p "Informe o numero (Padrao: 1):" nOS
-        $dirMySQL -u root -e "USE mapos; ALTER TABLE os AUTO_INCREMENT=$nOS;"
+        $dirMySQL -u root -p"$db_pass" -e "USE mapos; ALTER TABLE os AUTO_INCREMENT=$nOS;"
         echo "* Número da próxima OS alterado para $nOS"
     fi
     # <=== Fim Configuracao da Cron ===>

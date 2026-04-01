@@ -236,13 +236,29 @@ GOTO etapa0
 
 :: <=== Inicio Configuração pelo Browser ===>
 :etapa8
-%dirMySQL%\mysql.exe -u "root" -e "create database `mapos`;" >NUL 2>&1
+ECHO # CONFIGURANDO BANCO DE DADOS...
+%dirMySQL%\mysql.exe -u root -e "quit" >NUL 2>&1
+IF %ERRORLEVEL% EQU 0 GOTO set_pass_bat
+SET /p db_pass=O usuario root do MySQL ja possui uma senha. Por favor, digite-a:
+GOTO create_db_bat
+
+:set_pass_bat
+SET /p db_pass=Defina uma senha para o usuario root do MySQL (pressione Enter para gerar uma automaticamente):
+IF "%db_pass%"=="" (
+    FOR /F "usebackq tokens=*" %%i IN (`PowerShell -command "-join ((48..57) + (65..90) + (97..122) | Get-Random -Count 12 | %% {[char]$_})"`) DO SET "db_pass=%%i"
+)
+%dirMySQL%\mysql.exe -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%db_pass%';" >NUL 2>&1
+ECHO Senha do MySQL root configurada com sucesso.
+
+:create_db_bat
+%dirMySQL%\mysql.exe -u "root" -p"%db_pass%" -e "create database `mapos`;" >NUL 2>&1
+
 ECHO # CONFIGURANDO MAPOS...
 ECHO Clique em "Proximo" e insira os dados abaixo:
 ECHO.
 ECHO Host: localhost
 ECHO Usuario: root
-ECHO Senha: "Em Branco"
+IF "%db_pass%"=="" (ECHO Senha: "Em Branco") ELSE (ECHO Senha: %db_pass%)
 ECHO Banco de Dados: mapos
 ECHO.
 ECHO Nome: "Digite seu Nome Completo"
@@ -320,11 +336,11 @@ GOTO etapa0
 
 :: <=== Inicio Alterar Número da OS ===>
 :etapa11
-FOR /F  %%A IN (' %dirMySQL%\mysql.exe -u root -e "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA='mapos' AND TABLE_NAME='os'" --batch --raw --silent ') do ECHO A proxima OS criada sera %%A
+FOR /F  %%A IN (' %dirMySQL%\mysql.exe -u root -p"%db_pass%" -e "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA='mapos' AND TABLE_NAME='os'" --batch --raw --silent ') do ECHO A proxima OS criada sera %%A
 CHOICE /C SN /M "Gostaria de alterar o numero da proxima OS?"
 IF ERRORLEVEL 2 GOTO etapaFim
 IF ERRORLEVEL 1 SET /p nOS=Informe o numero para a proxima OS:
-%dirMySQL%\mysql.exe -u "root" -e "use mapos; ALTER TABLE os AUTO_INCREMENT=%nOS%;" >NUL 2>&1
+%dirMySQL%\mysql.exe -u "root" -p"%db_pass%" -e "use mapos; ALTER TABLE os AUTO_INCREMENT=%nOS%;" >NUL 2>&1
 GOTO etapaFim
 :: <=== Fim Alterar Número da OS ===>
 
