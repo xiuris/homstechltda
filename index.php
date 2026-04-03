@@ -63,7 +63,7 @@ if (file_exists($composerAutoloadFile)) {
 }
 
 $envFile = __DIR__ . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . '.env';
-if (file_exists($envFile) && file_exists($composerAutoloadFile)) {
+if (file_exists($envFile)) {
     $envFilePath = __DIR__ . DIRECTORY_SEPARATOR . 'application';
     $dotenv = Dotenv\Dotenv::createImmutable($envFilePath);
     $dotenv->load();
