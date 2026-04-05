@@ -69,10 +69,10 @@ if (! empty($_POST)) {
 
     //set admin information to database
     $now = date('Y-m-d H:i:s');
-    $sql = str_replace('admin_name', $full_name, $sql);
-    $sql = str_replace('admin_email', $email, $sql);
-    $sql = str_replace('admin_password', password_hash($login_password, PASSWORD_DEFAULT), $sql);
-    $sql = str_replace('admin_created_at', $now, $sql);
+    // ⚡ Bolt: Consolidate str_replace calls to avoid string parsing overhead and memory allocations
+    $sql_search = ['admin_name', 'admin_email', 'admin_password', 'admin_created_at'];
+    $sql_replace = [$full_name, $email, password_hash($login_password, PASSWORD_DEFAULT), $now];
+    $sql = str_replace($sql_search, $sql_replace, $sql);
 
     //create tables in datbase
     $mysqli->multi_query($sql);
@@ -85,23 +85,36 @@ if (! empty($_POST)) {
     $env_file = file_get_contents($env_file_path);
 
     // set the database config file
-    $env_file = str_replace('enter_db_hostname', $host, $env_file);
-    $env_file = str_replace('enter_db_username', $dbuser, $env_file);
-    $env_file = str_replace('enter_db_password', $dbpassword, $env_file);
-    $env_file = str_replace('enter_db_name', $dbname, $env_file);
-
-    // set random enter_encryption_key
     $encryption_key = substr(md5(rand()), 0, 15);
-    $env_file = str_replace('enter_encryption_key', $encryption_key, $env_file);
-    $env_file = str_replace('enter_baseurl', $base_url, $env_file);
+    $jwt_key = base64_encode(openssl_random_pseudo_bytes(32));
 
-    // set random enter_jwt_key
-    $env_file = str_replace('enter_jwt_key', base64_encode(openssl_random_pseudo_bytes(32)), $env_file);
-    $env_file = str_replace('enter_token_expire_time', $_POST['enter_token_expire_time'], $env_file);
-    $env_file = str_replace('enter_api_enabled', (string) $_POST['enter_api_enabled'], $env_file);
+    // ⚡ Bolt: Consolidate str_replace calls to avoid string parsing overhead and memory allocations
+    $env_search = [
+        'enter_db_hostname',
+        'enter_db_username',
+        'enter_db_password',
+        'enter_db_name',
+        'enter_encryption_key',
+        'enter_baseurl',
+        'enter_jwt_key',
+        'enter_token_expire_time',
+        'enter_api_enabled',
+        'pre_installation'
+    ];
+    $env_replace = [
+        $host,
+        $dbuser,
+        $dbpassword,
+        $dbname,
+        $encryption_key,
+        $base_url,
+        $jwt_key,
+        $_POST['enter_token_expire_time'],
+        (string) $_POST['enter_api_enabled'],
+        'production'
+    ];
 
-    // set the environment = production
-    $env_file = str_replace('pre_installation', 'production', $env_file);
+    $env_file = str_replace($env_search, $env_replace, $env_file);
 
     if (file_put_contents('..' . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . '.env', $env_file)) {
         echo json_encode(['success' => true, 'message' => 'Instalação bem sucedida.']);
