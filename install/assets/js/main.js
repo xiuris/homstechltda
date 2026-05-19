@@ -1,11 +1,15 @@
 var onFormSubmit = function ($form) {
-  $form.find('[type="submit"]').attr('disabled', 'disabled').find(".loader").removeClass("hide");
-  $form.find('[type="submit"]').find(".button-text").addClass("hide");
+  // ⚡ Bolt: Caching jQuery selector for submit button to avoid redundant DOM traversal
+  var $submitBtn = $form.find('[type="submit"]');
+  $submitBtn.attr('disabled', 'disabled').find(".loader").removeClass("hide");
+  $submitBtn.find(".button-text").addClass("hide");
   $("#alert-container").html("");
 };
 var onSubmitSussess = function ($form) {
-  $form.find('[type="submit"]').removeAttr('disabled').find(".loader").addClass("hide");
-  $form.find('[type="submit"]').find(".button-text").removeClass("hide");
+  // ⚡ Bolt: Caching jQuery selector for submit button to avoid redundant DOM traversal
+  var $submitBtn = $form.find('[type="submit"]');
+  $submitBtn.removeAttr('disabled').find(".loader").addClass("hide");
+  $submitBtn.find(".button-text").removeClass("hide");
 };
 
 $(document).ready(function () {
