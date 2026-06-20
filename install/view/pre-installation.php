@@ -64,13 +64,15 @@
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($settings['extensions'] as $value) { ?>
+          <?php foreach ($settings['extensions'] as $value) {
+              // Cache the extension_loaded result to avoid redundant function calls and improve rendering performance.
+              $is_loaded = extension_loaded($value); ?>
             <tr>
               <td>
                 <?php echo $value; ?>
               </td>
               <td>
-                <?php if (extension_loaded($value)) { ?>
+                <?php if ($is_loaded) { ?>
                   On
                 <?php } else { ?>
                   Off
@@ -78,7 +80,7 @@
               </td>
               <td>On</td>
               <td class="text-center">
-                <?php if (extension_loaded($value)) { ?>
+                <?php if ($is_loaded) { ?>
                   <i class="status fa fa-check-circle-o"></i>
                 <?php } else { ?>
                   <i class="status fa fa-times-circle-o"></i>
